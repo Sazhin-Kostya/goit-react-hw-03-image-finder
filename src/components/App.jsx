@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import ImageGallery from './ImageGallery/ImageGallery';
 import SearchBar from './Searchbar/Searchbar';
-import { getCards } from './GetCards/GetCArds';
+import { GetCards } from './GetCards/GetCArds';
 import LoadMoreButton from './Button/Button';
 
 export class App extends Component {
@@ -20,7 +20,7 @@ export class App extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    this.setState({ query: this.state.value, page: 1, cards: [] });
+    this.setState({ query: this.state.value });
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -30,19 +30,18 @@ export class App extends Component {
     ) {
       this.setState({ loading: true });
       try {
-        const cards = await getCards(this.state.query, this.state.page);
+        const cards = await GetCards(this.state.query, this.state.page);
+
         this.setState({ cards: cards });
-        const processedImages = cards.map(card => ({
-          key: card.id,
+
+        const processedCard = cards.map(card => ({
           id: card.id,
           webformatURL: card.webformatURL,
           largeImageURL: card.largeImageURL,
         }));
-        // this.setState({ images: processedImages });
         this.setState(prevState => ({
-          cards: [...prevState.cards, ...processedImages],
+          cards: [...prevState.cards, ...processedCard],
         }));
-        // this.setState({ images: processedImages });
       } catch (error) {
         console.log('OOPs...');
       } finally {
@@ -54,7 +53,7 @@ export class App extends Component {
   handleLoadMore = async () => {
     const { page } = this.state;
     const nextPage = page + 1;
-    this.setState({ page: nextPage, cards: [] });
+    this.setState({ page: nextPage });
   };
 
   render() {
