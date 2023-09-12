@@ -21,7 +21,6 @@ export class App extends Component {
 
   handleChange = e => {
     this.setState({ value: e.target.value });
-    console.log(e.target.value);
   };
   handleSubmit = e => {
     e.preventDefault();
@@ -78,7 +77,7 @@ export class App extends Component {
     document.removeEventListener('keydown', this.handleEsc);
 
     this.setState({
-      ModalOpen: false,
+      modalOpen: false,
       openImg: '',
     });
   };
