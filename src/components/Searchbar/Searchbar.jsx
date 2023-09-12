@@ -1,13 +1,13 @@
 export default function SearchBar({ handleSubmit, handleChange, value }) {
   return (
-    <header className="searchbar">
-      <form className="form" onSubmit={handleSubmit}>
+    <header className="Searchbar">
+      <form className="SearchForm" onSubmit={handleSubmit}>
         <button type="submit" className="button">
-          <span className="button-label">Search</span>
+          <span className="SearchForm-button">Search</span>
         </button>
 
         <input
-          className="input"
+          className="SearchForm-input"
           type="text"
           autoComplete="off"
           autoFocus

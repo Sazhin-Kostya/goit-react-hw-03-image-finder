@@ -3,6 +3,8 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import SearchBar from './Searchbar/Searchbar';
 import { GetCards } from './GetCards/GetCArds';
 import LoadMoreButton from './Button/Button';
+import Loader from './Loader/Loader';
+import { Modal } from './Modal/Modal';
 
 export class App extends Component {
   state = {
@@ -12,6 +14,9 @@ export class App extends Component {
     loading: false,
     error: false,
     value: '',
+    loadMore: false,
+    modalOpen: false,
+    openImg: '',
   };
 
   handleChange = e => {
@@ -20,7 +25,7 @@ export class App extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    this.setState({ query: this.state.value });
+    this.setState({ query: this.state.value, page: 1, cards: [] });
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -32,7 +37,12 @@ export class App extends Component {
       try {
         const cards = await GetCards(this.state.query, this.state.page);
 
-        this.setState({ cards: cards });
+        if (cards.length > 0) {
+          this.setState({ loadMore: true });
+        }
+        if (cards.length < 12) {
+          this.setState({ loadMore: false });
+        }
 
         const processedCard = cards.map(card => ({
           id: card.id,
@@ -56,6 +66,29 @@ export class App extends Component {
     this.setState({ page: nextPage });
   };
 
+  openModal = cardUrl => {
+    document.addEventListener('keydown', this.handleEsc);
+    this.setState({
+      modalOpen: true,
+      openImg: cardUrl,
+    });
+  };
+
+  closeModal = () => {
+    document.removeEventListener('keydown', this.handleEsc);
+
+    this.setState({
+      ModalOpen: false,
+      openImg: '',
+    });
+  };
+
+  handleEsc = e => {
+    if (e.key === 'Escape' && this.state.modalOpen) {
+      this.closeModal();
+    }
+  };
+
   render() {
     return (
       <>
@@ -64,9 +97,20 @@ export class App extends Component {
           handleChange={this.handleChange}
           value={this.state.value}
         />
-        {this.state.loading && <div>Загрузка</div>}
-        <ImageGallery cards={this.state.cards} />
-        <LoadMoreButton handleLoadMore={this.handleLoadMore} />
+        {this.state.loading ? (
+          <Loader />
+        ) : (
+          <ImageGallery cards={this.state.cards} openModal={this.openModal} />
+        )}
+
+        {this.state.loadMore && (
+          <LoadMoreButton handleLoadMore={this.handleLoadMore} />
+        )}
+        <Modal
+          isOpen={this.state.modalOpen}
+          onClose={this.closeModal}
+          cardUrl={this.state.openImg}
+        />
       </>
     );
   }
